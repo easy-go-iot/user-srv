@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/anaskhan96/go-password-encoder"
 	"github.com/golang/protobuf/ptypes/empty"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
@@ -56,6 +57,7 @@ func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 
 // GetUserList 获取用户列表
 func (s *UserServer) GetUserList(ctx context.Context, req *proto.PageInfo) (*proto.UserListResponse, error) {
+	zap.S().Info("GetUserList")
 	var users []model.User
 	result := global.DB.Find(&users)
 	if result.Error != nil {
@@ -76,6 +78,7 @@ func (s *UserServer) GetUserList(ctx context.Context, req *proto.PageInfo) (*pro
 
 // GetUserByMobile 通过手机号码查询用户
 func (s *UserServer) GetUserByMobile(ctx context.Context, req *proto.MobilerRequest) (*proto.UserInfoResponse, error) {
+	zap.S().Info("GetUserByMobile")
 	var user model.User
 	result := global.DB.Where(&model.User{Mobile: req.Mobile}).First(&user)
 	if result.RowsAffected == 0 {
@@ -91,6 +94,7 @@ func (s *UserServer) GetUserByMobile(ctx context.Context, req *proto.MobilerRequ
 
 // GetUserById 通过id查询用户
 func (s *UserServer) GetUserById(ctx context.Context, req *proto.IdRequest) (*proto.UserInfoResponse, error) {
+	zap.S().Info("GetUserById")
 	var user model.User
 	result := global.DB.First(&user, req.Id)
 	if result.RowsAffected == 0 {
@@ -106,6 +110,7 @@ func (s *UserServer) GetUserById(ctx context.Context, req *proto.IdRequest) (*pr
 
 // CreateUser 新建用户
 func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) (*proto.UserInfoResponse, error) {
+	zap.S().Info("CreateUser")
 	var user model.User
 	result := global.DB.Where(&model.User{Mobile: req.Mobile}).First(&user)
 	if result.RowsAffected == 1 {
@@ -131,6 +136,7 @@ func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 
 // UpdateUser 个人中心更新用户
 func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) (*empty.Empty, error) {
+	zap.S().Info("UpdateUser")
 	var user model.User
 	result := global.DB.First(&user, req.Id)
 	if result.RowsAffected == 0 {
@@ -151,6 +157,7 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) 
 
 // CheckPassWord 校验密码
 func (s *UserServer) CheckPassWord(ctx context.Context, req *proto.PasswordCheckInfo) (*proto.CheckResponse, error) {
+	zap.S().Info("CheckPassWord")
 	options := &password.Options{16, 100, 32, sha512.New}
 	passwordInfo := strings.Split(req.EncryptedPassword, "$")
 	check := password.Verify(req.Password, passwordInfo[2], passwordInfo[3], options)
