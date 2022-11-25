@@ -19,7 +19,8 @@ import (
 )
 
 func main() {
-	IP := flag.String("ip", GetLocalIP(), "ip地址")
+	//IP := flag.String("ip", GetLocalIP(), "ip地址")
+	IP := flag.String("ip", "127.0.0.1", "ip地址")
 	Port := flag.Int("port", 0, "端口号")
 
 	//初始化
