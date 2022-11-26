@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"google.golang.org/grpc/health"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"easy-go-iot/user-srv/global"
 	"easy-go-iot/user-srv/handler"
@@ -20,7 +22,7 @@ import (
 
 func main() {
 	//IP := flag.String("ip", GetLocalIP(), "ip地址")
-	IP := flag.String("ip", "127.0.0.1", "ip地址")
+	IP := flag.String("ip", GetLocalIP(), "ip地址")
 	Port := flag.Int("port", 0, "端口号")
 
 	//初始化
@@ -52,6 +54,24 @@ func main() {
 		if err != nil {
 			panic("failed to start grpc:" + err.Error())
 		}
+	}()
+
+	go func() {
+		time.Sleep(10 * time.Second)
+		conn, err := grpc.Dial(fmt.Sprintf("%s:%d", GetLocalIP(), Port),
+			grpc.WithInsecure())
+		if err != nil {
+			panic(err)
+		}
+		userClient := proto.NewUserClient(conn)
+		rsp, err := userClient.GetUserById(context.Background(), &proto.IdRequest{
+			Id: int32(1),
+		})
+		if err != nil {
+			zap.S().Error(err)
+		}
+		zap.S().Info(rsp.Mobile, rsp.NickName, rsp.Password)
+		time.Sleep(5 * time.Second)
 	}()
 
 	//接收终止信号
