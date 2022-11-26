@@ -58,7 +58,7 @@ func main() {
 
 	go func() {
 		time.Sleep(10 * time.Second)
-		conn, err := grpc.Dial(fmt.Sprintf("%s:%d", GetLocalIP(), Port),
+		conn, err := grpc.Dial(fmt.Sprintf("%s:%d", *IP, *Port),
 			grpc.WithInsecure())
 		if err != nil {
 			panic(err)
