@@ -1,23 +1,20 @@
 package main
 
 import (
-	"context"
+	"easy-go-iot/user-srv/global"
+	"easy-go-iot/user-srv/handler"
+	"easy-go-iot/user-srv/initialize"
+	proto "easy-go-iot/user-srv/proto"
 	"flag"
 	"fmt"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
-
-	"easy-go-iot/user-srv/global"
-	"easy-go-iot/user-srv/handler"
-	"easy-go-iot/user-srv/initialize"
-	proto "easy-go-iot/user-srv/proto"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -55,24 +52,41 @@ func main() {
 			panic("failed to start grpc:" + err.Error())
 		}
 	}()
+	//
+	//go func() {
+	//	time.Sleep(10 * time.Second)
+	//	conn, err := grpc.Dial(fmt.Sprintf("%s:%d", *IP, *Port),
+	//		grpc.WithInsecure())
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	userClient := proto.NewUserClient(conn)
+	//	rsp, err := userClient.GetUserById(context.Background(), &proto.IdRequest{
+	//		Id: int32(1),
+	//	})
+	//	if err != nil {
+	//		zap.S().Error(err)
+	//	}
+	//	zap.S().Info(rsp.Mobile, rsp.NickName, rsp.Password)
+	//}()
 
-	go func() {
-		time.Sleep(10 * time.Second)
-		conn, err := grpc.Dial(fmt.Sprintf("%s:%d", *IP, *Port),
-			grpc.WithInsecure())
-		if err != nil {
-			panic(err)
-		}
-		userClient := proto.NewUserClient(conn)
-		rsp, err := userClient.GetUserById(context.Background(), &proto.IdRequest{
-			Id: int32(1),
-		})
-		if err != nil {
-			zap.S().Error(err)
-		}
-		zap.S().Info(rsp.Mobile, rsp.NickName, rsp.Password)
-		time.Sleep(5 * time.Second)
-	}()
+	//go func() {
+	//	time.Sleep(20 * time.Second)
+	//	userConn, err := grpc.Dial(
+	//		fmt.Sprintf("%s:%d", "userrpc-service", 50001),
+	//		grpc.WithInsecure())
+	//	if err != nil {
+	//		zap.S().Fatal("[InitSrvConn] 连接 【用户服务失败】")
+	//	}
+	//	userClient := proto.NewUserClient(userConn)
+	//	rsp, err := userClient.GetUserById(context.Background(), &proto.IdRequest{
+	//		Id: int32(1),
+	//	})
+	//	if err != nil {
+	//		zap.S().Error(err)
+	//	}
+	//	zap.S().Info(rsp.Mobile, rsp.NickName, rsp.Password)
+	//}()
 
 	//接收终止信号
 	quit := make(chan os.Signal)
